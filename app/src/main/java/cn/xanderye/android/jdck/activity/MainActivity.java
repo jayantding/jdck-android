@@ -184,6 +184,13 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "未获取到Cookie，请先登录", Toast.LENGTH_SHORT).show();
                 return;
             }
+            String selectedPhone = (String) phoneSpinner.getSelectedItem();
+            String Phone="";
+            if (selectedPhone != null) {
+                String[] info=  selectedPhone.split(" ");
+                Phone=info[0];
+            }
+
             String cookie = MessageFormat.format("pt_key={0};pt_pin={1};", ptKey, ptPin);
             QlInfo qlInfo = Config.getInstance().getQlInfo();
             copyToClipboard(cookie);
@@ -191,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "获取成功，已复制到剪切板", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "获取成功，已复制到剪切板，尝试自动更新青龙面板环境变量", Toast.LENGTH_SHORT).show();
-                updateCookie(cookie);
+                updateCookie(cookie,Phone);
             }
         });
         // 重置cookie刷新页面按钮
@@ -411,7 +418,7 @@ public class MainActivity extends AppCompatActivity {
      * @author XanderYe
      * @date 2022/5/11
      */
-    private void updateCookie(String cookie) {
+    private void updateCookie(String cookie,String phone) {
         Map<String, Object> map = JDUtil.formatCookies(cookie);
         String ptPin = (String) map.get("pt_pin");
         QlInfo qlInfo = Config.getInstance().getQlInfo();
@@ -433,6 +440,7 @@ public class MainActivity extends AppCompatActivity {
             targetEnv.setName("JD_COOKIE");
         }
         targetEnv.setValue(cookie);
+        targetEnv.setRemarks(phone);
         ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
         QlEnv finalTargetEnv = targetEnv;
         singleThreadExecutor.execute(() -> {
